@@ -112,11 +112,15 @@ namespace Vershinina_Tomogram_vizualizer
                 {
                     view.DrawQuadStrip(currentLayer, min, width);
                 }
-                else
+                else if (radioButton2.Checked)
                 {
                     view.DrawQuads(currentLayer, min, width);
                 }
-                glControl1.SwapBuffers();
+                else
+                {
+                    view.TriangleStrip(currentLayer, min, width);
+                }
+                    glControl1.SwapBuffers();
             }
         }
 
@@ -189,6 +193,15 @@ namespace Vershinina_Tomogram_vizualizer
             if (loaded)
             {
                 glControl1.Invalidate(); // Перерисовка при изменении
+            }
+        }
+
+        private void radioButton4_CheckedChanged(object sender, EventArgs e)
+        {
+            if (radioButton4.Checked)
+            {
+                useTextureRendering = false;
+                if (loaded) glControl1.Invalidate();
             }
         }
     }

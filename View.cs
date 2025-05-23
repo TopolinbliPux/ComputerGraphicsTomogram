@@ -60,6 +60,72 @@ namespace Vershinina_Tomogram_vizualizer
             GL.End();
         }
 
+        public void TriangleStrip(int layerNumber, int min, int width)
+        {
+            GL.Clear(ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit);
+            GL.Begin(PrimitiveType.TriangleStrip);
+
+            for (int y = 0; y < Bin.Y; y++)
+            {
+                // Меняем направление для каждой второй строки
+                bool reverse = (y % 2 == 1);
+                //если y-нечетное, то идет в обратном направлении
+                //если y-четное, то идет в прямом направлении
+                int start;
+                int end;
+                int step;
+                if (reverse)
+                {
+                    //обратное направление
+                    start = Bin.X - 1;
+                    end = -1;
+                    step = -1;
+                }
+                else
+                {
+                    //прямое напраление
+                    start = 0;
+                    end = Bin.X;
+                    step = 1;
+                }
+
+                    for (int x = start; x != end; x += step)
+                    {
+                        // Верхняя вершина
+                        short valTop = Bin.array[x + y * Bin.X + layerNumber * Bin.X * Bin.Y];
+                        GL.Color3(TransferFunction(valTop, min, width));
+                        GL.Vertex2(x, y);
+
+                        // Нижняя вершина (если не последняя строка)
+                        if (y < Bin.Y - 1)
+                        {
+                            short valBottom = Bin.array[x + (y + 1) * Bin.X + layerNumber * Bin.X * Bin.Y];
+                            GL.Color3(TransferFunction(valBottom, min, width));
+                            GL.Vertex2(x, y + 1);
+                        }
+                    }
+
+                // Возвращаемся в начало строки для зигзага
+                if (y < Bin.Y - 1)
+                {
+                    int x;
+                    if (reverse)
+                    {
+                        x = 1;
+                    }
+                    else 
+                    { 
+                        x = Bin.X - 1; 
+                    }
+                        short val = Bin.array[x + (y + 1) * Bin.X + layerNumber * Bin.X * Bin.Y];
+                    GL.Color3(TransferFunction(val, min, width));
+                    GL.Vertex2(x, y + 1);
+                }
+            }
+
+            GL.End();
+        }
+
         public void DrawQuadStrip(int layerNumber,int min, int width)
         {
             GL.Clear(ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit);
